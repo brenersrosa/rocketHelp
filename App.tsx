@@ -1,5 +1,4 @@
 import { NativeBaseProvider, StatusBar } from 'native-base';
-import { ToastProvider } from 'react-native-toast-notifications';
 import {
   useFonts,
   Roboto_400Regular,
@@ -16,14 +15,12 @@ export default function App() {
 
   return (
     <NativeBaseProvider theme={THEME}>
-      {/* <ToastProvider> */}
         <StatusBar
           barStyle="light-content"
           backgroundColor="transparent"
           translucent
         />
         {fontsLoaded ? <Routes /> : <Loading />}
-      {/* </ToastProvider> */}
     </NativeBaseProvider>
   );
 }

@@ -1,8 +1,18 @@
 {
   "expo": {
-    "name": "rockethelp",
+    "name": "RocketHelp",
     "slug": "rockethelp",
     "version": "1.0.0",
+    "platforms": [
+      "ios",
+      "android"
+    ],
+    "icon": "./src/assets/icon.png",
+    "splash": {
+      "image": "./src/assets/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#121214"
+    },
     "assetBundlePatterns": ["**/*"],
     "plugins": ["@react-native-firebase/app"],
     "android": {
