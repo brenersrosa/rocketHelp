@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import auth from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
+import firestore, { firebase } from '@react-native-firebase/firestore';
 import { Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import {
@@ -60,13 +60,26 @@ export function Home() {
       .where('status', '==', statusSelected)
       .onSnapshot((snapshot) => {
         const data = snapshot.docs.map((doc) => {
-          const { patrimony, description, status, created_at } = doc.data();
+          const {
+            patrimony,
+            description,
+            solution,
+            status,
+            user_created,
+            created_at,
+            user_closed,
+            closed_at,
+          } = doc.data();
           return {
             id: doc.id,
             patrimony,
             description,
+            solution,
             status,
+            user_created,
             when: dateFormat(created_at),
+            user_closed,
+            closed: dateFormat(closed_at),
           };
         });
 
@@ -124,6 +137,7 @@ export function Home() {
           <Loading />
         ) : (
           <FlatList
+            mb={6}
             data={orders}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (

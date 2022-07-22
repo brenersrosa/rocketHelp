@@ -3,6 +3,7 @@ import { Alert } from 'react-native';
 import { VStack } from 'native-base';
 import { useNavigation } from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
+import { firebase } from '@react-native-firebase/auth';
 
 import { Header } from '../components/Header';
 import { Input } from '../components/Input';
@@ -28,6 +29,10 @@ export function Register() {
         patrimony,
         description,
         status: 'open',
+        user_created: {
+          uid: firebase.auth().currentUser.uid,
+          email: firebase.auth().currentUser.email,
+        },
         created_at: firestore.FieldValue.serverTimestamp(),
       })
       .then(() => {

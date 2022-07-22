@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Alert } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
+import { firebase } from '@react-native-firebase/auth';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { HStack, VStack, useTheme, Text, ScrollView, Box } from 'native-base';
 import {
@@ -27,6 +28,14 @@ type RouteParams = {
 type OrderDetails = OrderProps & {
   description: string;
   solution: string;
+  user_created?: {
+    uid: string;
+    email: string;
+  };
+  user_closed?: {
+    uid: string;
+    email: string;
+  };
   closed: string;
 };
 
@@ -56,6 +65,10 @@ export function Details() {
       .update({
         status: 'closed',
         solution,
+        user_closed: {
+          uid: firebase.auth().currentUser.uid,
+          email: firebase.auth().currentUser.email,
+        },
         closed_at: firestore.FieldValue.serverTimestamp(),
       })
       .then(() => {
@@ -77,10 +90,12 @@ export function Details() {
         const {
           patrimony,
           description,
-          status,
-          created_at,
-          closed_at,
           solution,
+          status,
+          user_created,
+          created_at,
+          user_closed,
+          closed_at,
         } = doc.data();
 
         const closed = closed_at ? dateFormat(closed_at) : null;
@@ -89,9 +104,11 @@ export function Details() {
           id: doc.id,
           patrimony,
           description,
-          status,
           solution,
+          status,
+          user_created,
           when: dateFormat(created_at),
+          user_closed,
           closed,
         });
 
@@ -130,20 +147,31 @@ export function Details() {
       <ScrollView mx={5} showsVerticalScrollIndicator={false}>
         <CardDetails
           title="equipamento"
-          description={`Patrimônio ${order.patrimony}`}
+          description={`Patrimônio: ${order.patrimony}`}
           icon={DesktopTower}
         />
         <CardDetails
           title="descrição do problema"
           description={order.description}
           icon={ClipboardText}
-          footer={`Registrado em ${order.when}`}
+          footer={`Registrado em ${order.when} por ${
+            firebase.auth().currentUser.email == order.user_created.email
+              ? 'você'
+              : order.user_created.email
+          }`}
         />
         <CardDetails
           title="solução"
           icon={CircleWavyCheck}
           description={order.solution}
-          footer={order.closed && `Encerrado em ${order.closed}`}
+          footer={
+            order.closed &&
+            `Encerrado em ${order.closed} por ${
+              firebase.auth().currentUser.email == order.user_closed.email
+                ? 'você'
+                : order.user_created.email
+            }`
+          }
         >
           {order.status === 'open' && (
             <Input
@@ -157,8 +185,10 @@ export function Details() {
           )}
         </CardDetails>
       </ScrollView>
-      {order.status === 'open' && (
+      {order.status === 'open' ? (
         <Button title="Encerrar solicitação" m={5} onPress={handleOrderClose} />
+      ) : (
+        <Button title="Solicitação finalizada" m={5} isDisabled />
       )}
     </VStack>
   );

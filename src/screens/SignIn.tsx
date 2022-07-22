@@ -16,7 +16,7 @@ export function SignIn() {
   const { colors } = useTheme();
 
   function handleSignIn() {
-    if(!email || !password) {
+    if (!email || !password) {
       return Alert.alert('Entrar', 'Informe e-mail e senha.');
     }
 
@@ -31,14 +31,14 @@ export function SignIn() {
         console.log(error);
         setIsLoading(false);
 
-        if(
+        if (
           error.code === 'auth/invalid-email' ||
           error.code === 'auth/wrong-password'
         ) {
           return Alert.alert('Entrar', 'E-mail ou senha inválidos.');
         }
 
-        if(error.code === 'auth/user-not-found') {
+        if (error.code === 'auth/user-not-found') {
           return Alert.alert('Entrar', 'Usuário não cadastrado.');
         }
 
@@ -70,7 +70,12 @@ export function SignIn() {
         value={password}
         onChangeText={setPassword}
       />
-      <Button title="Entrar" onPress={handleSignIn} isLoading={isLoading} />
+      <Button
+        title="Entrar"
+        onPress={handleSignIn}
+        isLoading={isLoading}
+        w="full"
+      />
     </VStack>
   );
 }
