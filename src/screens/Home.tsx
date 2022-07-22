@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import auth from '@react-native-firebase/auth';
-import firestore, { firebase } from '@react-native-firebase/firestore';
-import { Alert } from 'react-native';
+import firestore from '@react-native-firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import {
   HStack,
@@ -12,6 +11,7 @@ import {
   Heading,
   FlatList,
   Center,
+  useToast,
 } from 'native-base';
 import { SignOut, ChatTeardropText } from 'phosphor-react-native';
 
@@ -21,6 +21,7 @@ import { Filter } from '../components/Filter';
 import { Order, OrderProps } from '../components/Order';
 import { Button } from '../components/Button';
 import { Loading } from '../components/Loading';
+import { Toast } from '../components/Toast';
 
 import Logo from '../assets/logo_secondary.svg';
 
@@ -35,6 +36,8 @@ export function Home() {
 
   const { colors } = useTheme();
 
+  const toast = useToast();
+
   function handleNewOrder() {
     navigation.navigate('new');
   }
@@ -48,7 +51,12 @@ export function Home() {
       .signOut()
       .catch((error) => {
         console.log(error);
-        return Alert.alert('Sair', 'Não foi possível sair.');
+        return toast.show({
+          placement: 'top',
+          render: () => {
+            return <Toast title="Não foi possível sair." variant="error" />;
+          },
+        });
       });
   }
 

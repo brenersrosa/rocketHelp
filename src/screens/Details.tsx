@@ -1,14 +1,22 @@
 import { useState, useEffect } from 'react';
-import { Alert } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import { firebase } from '@react-native-firebase/auth';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { HStack, VStack, useTheme, Text, ScrollView, Box } from 'native-base';
+import {
+  HStack,
+  VStack,
+  useTheme,
+  Text,
+  ScrollView,
+  Box,
+  useToast,
+} from 'native-base';
 import {
   CircleWavyCheck,
   Hourglass,
   DesktopTower,
   ClipboardText,
+  Check,
 } from 'phosphor-react-native';
 
 import { Header } from '../components/Header';
@@ -17,6 +25,7 @@ import { Loading } from '../components/Loading';
 import { CardDetails } from '../components/CardDetails';
 import { Input } from '../components/Input';
 import { Button } from '../components/Button';
+import { Toast } from '../components/Toast';
 
 import { OrderFirestoreDTO } from '../DTOs/OrderFirestoreDTO';
 import { dateFormat } from '../utils/firestoreDateFormat';
@@ -47,16 +56,20 @@ export function Details() {
   const navigation = useNavigation();
   const route = useRoute();
 
+  const toast = useToast();
+
   const { orderId } = route.params as RouteParams;
 
   const { colors } = useTheme();
 
   function handleOrderClose() {
     if (!solution) {
-      return Alert.alert(
-        'Solicitação',
-        'Informe a solução para encerrar a solicitação.'
-      );
+      return toast.show({
+        placement: 'top',
+        render: () => {
+          return <Toast title="Informe a solução para encerrar a solicitação." variant="error" />;
+        },
+      });
     }
 
     firestore()
@@ -72,12 +85,22 @@ export function Details() {
         closed_at: firestore.FieldValue.serverTimestamp(),
       })
       .then(() => {
-        Alert.alert('Solicitação', 'Solicitação encerrada.');
+        toast.show({
+          placement: 'top',
+          render: () => {
+            return <Toast title="Solicitação encerrada." variant="success" />;
+          },
+        });
         navigation.goBack();
       })
       .catch((error) => {
         console.log(error);
-        Alert.alert('Solicitação', 'Não foi possível encerrar a solicitação.');
+        toast.show({
+          placement: 'top',
+          render: () => {
+            return <Toast title="Não foi possível encerrar a solicitação." variant="error" />;
+          },
+        });
       });
   }
 

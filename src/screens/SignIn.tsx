@@ -1,12 +1,13 @@
-import { Heading, Icon, VStack, useTheme } from 'native-base';
-import auth from '@react-native-firebase/auth';
-import { Alert } from 'react-native';
-import { Envelope, Key } from 'phosphor-react-native';
 import { useState } from 'react';
+import { Heading, Icon, VStack, useTheme, useToast } from 'native-base';
+import auth from '@react-native-firebase/auth';
+import { Envelope, Key } from 'phosphor-react-native';
 
 import Logo from '../assets/logo_primary.svg';
+
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
+import { Toast } from '../components/Toast';
 
 export function SignIn() {
   const [isLoading, setIsLoading] = useState(false);
@@ -14,10 +15,16 @@ export function SignIn() {
   const [password, setPassword] = useState('');
 
   const { colors } = useTheme();
+  const toast = useToast();
 
   function handleSignIn() {
     if (!email || !password) {
-      return Alert.alert('Entrar', 'Informe e-mail e senha.');
+      return toast.show({
+        placement: 'top',
+        render: () => {
+          return <Toast title="Informe e-mail e senha." variant="error" />;
+        },
+      });
     }
 
     setIsLoading(true);
@@ -35,14 +42,31 @@ export function SignIn() {
           error.code === 'auth/invalid-email' ||
           error.code === 'auth/wrong-password'
         ) {
-          return Alert.alert('Entrar', 'E-mail ou senha inválidos.');
+          return toast.show({
+            placement: 'top',
+            render: () => {
+              return (
+                <Toast title="E-mail ou senha inválidos." variant="error" />
+              );
+            },
+          });
         }
 
         if (error.code === 'auth/user-not-found') {
-          return Alert.alert('Entrar', 'Usuário não cadastrado.');
+          return toast.show({
+            placement: 'top',
+            render: () => {
+              return <Toast title="Usuário não cadastrado." variant="error" />;
+            },
+          });
         }
 
-        return Alert.alert('Entrar', 'Não foi possível acessar.');
+        return toast.show({
+          placement: 'top',
+          render: () => {
+            return <Toast title="Não foi possível acessar." variant="error" />;
+          },
+        });
       });
   }
 

@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { Alert } from 'react-native';
-import { VStack } from 'native-base';
+import { VStack, useToast } from 'native-base';
 import { useNavigation } from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 import { firebase } from '@react-native-firebase/auth';
@@ -8,6 +7,7 @@ import { firebase } from '@react-native-firebase/auth';
 import { Header } from '../components/Header';
 import { Input } from '../components/Input';
 import { Button } from '../components/Button';
+import { Toast } from '../components/Toast';
 
 export function Register() {
   const [isLoading, setIsLoading] = useState(false);
@@ -16,9 +16,16 @@ export function Register() {
 
   const navigation = useNavigation();
 
+  const toast = useToast();
+
   function handleNewOrder() {
     if (!patrimony || !description) {
-      return Alert.alert('Registrar', 'Preencha todos os campos.');
+      return toast.show({
+        placement: 'top',
+        render: () => {
+          return <Toast title="Preencha todos os campos." variant="error" />;
+        },
+      });
     }
 
     setIsLoading(true);
@@ -36,16 +43,33 @@ export function Register() {
         created_at: firestore.FieldValue.serverTimestamp(),
       })
       .then(() => {
-        Alert.alert('Solicitação', 'Solicitação cadastrada com sucesso.');
+        toast.show({
+          placement: 'top',
+          render: () => {
+            return (
+              <Toast
+                title="Solicitação cadastrada com sucesso."
+                variant="success"
+              />
+            );
+          },
+        });
         navigation.goBack();
       })
       .catch((error) => {
         console.log(error);
         setIsLoading(false);
-        return Alert.alert(
-          'Solicitação',
-          'Não foi possível registrar o pedido.'
-        );
+        return toast.show({
+          placement: 'top',
+          render: () => {
+            return (
+              <Toast
+                title="Não foi possível registrar o pedido. Tente novamente mais tarde."
+                variant="error"
+              />
+            );
+          },
+        });
       });
   }
 
